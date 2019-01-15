@@ -1,4 +1,3 @@
-//#full-example
 package com.example
 
 import org.scalatest.{ BeforeAndAfterAll, WordSpecLike, Matchers }
@@ -9,7 +8,6 @@ import scala.language.postfixOps
 import Greeter._
 import Printer._
 
-//#test-classes
 class AkkaQuickstartSpec(_system: ActorSystem)
   extends TestKit(_system)
   with Matchers
@@ -23,8 +21,6 @@ class AkkaQuickstartSpec(_system: ActorSystem)
     shutdown(system)
   }
 
-  //#first-test
-  //#specification-example
   "A Greeter Actor" should {
     "pass on a greeting message when instructed to" in {
       //#specification-example
