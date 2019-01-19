@@ -4,34 +4,32 @@ import akka.actor.Actor
 
 class Philosopher(val MAX_LIFE: Int, val MAX_HUNGER: Int, val TIME_TO_EAT: Int) extends Actor {
 
-  var life = MAX_LIFE
-  var hunger = MAX_HUNGER
+  var life: Int = MAX_LIFE
+  var hunger: Int = 0
 
 
   override def receive: Receive = thinking
 
+  def print(): Unit = {
+    println(s"--- ${self.path.name} =>   life : $life/$MAX_LIFE   hunger : $hunger/$MAX_HUNGER")
+  }
+
   def thinking: Receive = {
     case "tictac" =>
-      val e : String = self.path.name
-      hunger = hunger-1
-      println(s"$e => hunger : $hunger ")
-
+      hunger += 1
+      sender() ! "I'm hungry !"
+      print()
   }
 
   def eating: Receive = {
-
     case "done eating" =>
-      println("I'm done eating !")
-      Thread.sleep(1000)
       context.become(thinking)
   }
 
-  def starving: Receive = {
+  def hungry: Receive = {
     case "eat" =>
-      println("Let's start eating !")
-      Thread.sleep(1000)
     context.become(eating)
   }
 
-  override def unhandled(message: Any): Unit = println(s"unhandled message : $message")
+  override def unhandled(message: Any): Unit = sender() ! "Mmmh ?"
 }
