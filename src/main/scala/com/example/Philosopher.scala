@@ -15,30 +15,35 @@ class Philosopher(val MAX_THINKING: Int, val MAX_HUNGER: Int, val TIME_TO_EAT: I
     println(s"--- ${self.path.name} =>   thinking time : $thinkingTime/$MAX_THINKING   hunger : $hungerTime/$MAX_HUNGER")
   }
 
+  private val TICTAC: String = "tictac"
+  private val HUNGRY: String = "hungry"
+  private val DONE_EATING: String = "done eating"
+  private val EAT: String = "eat"
+
   def thinking: Receive = {
-    case "tictac" =>
+    case TICTAC =>
       thinkingTime += 1
       numberOfTurnsSurvived +=1
-      if (thinkingTime == MAX_THINKING) self ! "hungry"
+      if (thinkingTime == MAX_THINKING) self ! HUNGRY
       print()
-    case "hungry" =>
+    case HUNGRY =>
       println(s"${self.path.name} is now hungry !")
       context.become(hungry)
   }
-
+  
   def eating: Receive = {
-    case "tictac" =>
+    case TICTAC =>
     eatingTurn += 1
     numberOfTurnsSurvived +=1
-    if (eatingTurn == TIME_TO_EAT) self ! "done eating"
+    if (eatingTurn == TIME_TO_EAT) self ! DONE_EATING
     print()
-    case "done eating" =>
+    case DONE_EATING =>
       println(s"${self.path.name} is back to thinking !")
       context.become(thinking)
   }
 
   def hungry: Receive = {
-    case "tictac" =>
+    case TICTAC =>
     hungerTime += 1
     numberOfTurnsSurvived += 1
     if (hungerTime == MAX_HUNGER) {
@@ -46,7 +51,7 @@ class Philosopher(val MAX_THINKING: Int, val MAX_HUNGER: Int, val TIME_TO_EAT: I
       self ! PoisonPill
     }
     print()
-    case "eat" =>
+    case EAT =>
     println(s"${self.path.name} is now eating !")
     context.become(eating)
   }
