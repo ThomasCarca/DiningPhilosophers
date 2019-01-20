@@ -2,24 +2,24 @@ package com.example
 
 import akka.actor.{Actor, PoisonPill}
 
-class Philosopher(val MAX_LIFE: Int, val MAX_HUNGER: Int, val TIME_TO_EAT: Int) extends Actor {
+class Philosopher(val MAX_THINKING: Int, val MAX_HUNGER: Int, val TIME_TO_EAT: Int) extends Actor {
 
-  var life: Int = MAX_LIFE
-  var hunger: Int = 0
+  var thinkingTime: Int = 0
+  var hungerTime: Int = 0
   var eatingTurn: Int = 0
   var numberOfTurnsSurvived: Int = 0
 
   override def receive: Receive = thinking
 
   def print(): Unit = {
-    println(s"--- ${self.path.name} =>   life : $life/$MAX_LIFE   hunger : $hunger/$MAX_HUNGER")
+    println(s"--- ${self.path.name} =>   thinking time : $thinkingTime/$MAX_THINKING   hunger : $hungerTime/$MAX_HUNGER")
   }
 
   def thinking: Receive = {
     case "tictac" =>
-      hunger += 1
+      thinkingTime += 1
       numberOfTurnsSurvived +=1
-      if (hunger == MAX_HUNGER) self ! "hungry"
+      if (thinkingTime == MAX_THINKING) self ! "hungry"
       print()
     case "hungry" =>
       println(s"${self.path.name} is now hungry !")
@@ -39,9 +39,9 @@ class Philosopher(val MAX_LIFE: Int, val MAX_HUNGER: Int, val TIME_TO_EAT: Int) 
 
   def hungry: Receive = {
     case "tictac" =>
-    life -= 1
+    hungerTime += 1
     numberOfTurnsSurvived += 1
-    if (life == 0) {
+    if (hungerTime == MAX_HUNGER) {
       println(s"${self.path.name} just died... He survived $numberOfTurnsSurvived turns.")
       self ! PoisonPill
     }

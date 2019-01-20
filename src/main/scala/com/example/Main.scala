@@ -4,13 +4,13 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 
 object Main extends App {
 
-  def life: Int = scala.util.Random.nextInt(10) + 5
+  def thinkingTime: Int = scala.util.Random.nextInt(10) + 5
 
-  def hunger: Int = scala.util.Random.nextInt(10) + 5
+  def hungerTime: Int = scala.util.Random.nextInt(10) + 5
 
   def timeToEat: Int = scala.util.Random.nextInt(3) + 2
 
-  def philosopherProp: Props = Props(new Philosopher(life, hunger, timeToEat))
+  def philosopherProp: Props = Props(new Philosopher(thinkingTime, hungerTime, timeToEat))
 
   val system: ActorSystem = ActorSystem("Dinner")
 
