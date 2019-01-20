@@ -4,6 +4,11 @@ import akka.actor.{Actor, PoisonPill}
 
 class Philosopher(val MAX_THINKING: Int, val MAX_HUNGER: Int, val TIME_TO_EAT: Int) extends Actor {
 
+  val TICTAC: String = "tictac"
+  val HUNGRY: String = "hungry"
+  val DONE_EATING: String = "done eating"
+  val EAT: String = "eat"
+
   var thinkingTime: Int = 0
   var hungerTime: Int = 0
   var eatingTurn: Int = 0
@@ -15,11 +20,6 @@ class Philosopher(val MAX_THINKING: Int, val MAX_HUNGER: Int, val TIME_TO_EAT: I
     println(s"--- ${self.path.name} =>   thinking time : $thinkingTime/$MAX_THINKING   hunger : $hungerTime/$MAX_HUNGER")
   }
 
-  private val TICTAC: String = "tictac"
-  private val HUNGRY: String = "hungry"
-  private val DONE_EATING: String = "done eating"
-  private val EAT: String = "eat"
-
   def thinking: Receive = {
     case TICTAC =>
       thinkingTime += 1
@@ -30,7 +30,7 @@ class Philosopher(val MAX_THINKING: Int, val MAX_HUNGER: Int, val TIME_TO_EAT: I
       println(s"${self.path.name} is now hungry !")
       context.become(hungry)
   }
-  
+
   def eating: Receive = {
     case TICTAC =>
     eatingTurn += 1
