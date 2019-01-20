@@ -4,11 +4,6 @@ import akka.actor.{Actor, PoisonPill}
 
 class Philosopher(val MAX_THINKING: Int, val MAX_HUNGER: Int, val TIME_TO_EAT: Int) extends Actor {
 
-  val TICTAC: String = "tictac"
-  val HUNGRY: String = "hungry"
-  val DONE_EATING: String = "done eating"
-  val EAT: String = "eat"
-
   var thinkingTime: Int = 0
   var hungerTime: Int = 0
   var eatingTurn: Int = 0
@@ -21,29 +16,29 @@ class Philosopher(val MAX_THINKING: Int, val MAX_HUNGER: Int, val TIME_TO_EAT: I
   }
 
   def thinking: Receive = {
-    case TICTAC =>
+    case Message.TICTAC =>
       thinkingTime += 1
       numberOfTurnsSurvived +=1
-      if (thinkingTime == MAX_THINKING) self ! HUNGRY
+      if (thinkingTime == MAX_THINKING) self ! Message.HUNGRY
       print()
-    case HUNGRY =>
+    case Message.HUNGRY =>
       println(s"${self.path.name} is now hungry !")
       context.become(hungry)
   }
 
   def eating: Receive = {
-    case TICTAC =>
+    case Message.TICTAC =>
     eatingTurn += 1
     numberOfTurnsSurvived +=1
-    if (eatingTurn == TIME_TO_EAT) self ! DONE_EATING
+    if (eatingTurn == TIME_TO_EAT) self ! Message.DONE_EATING
     print()
-    case DONE_EATING =>
+    case Message.DONE_EATING =>
       println(s"${self.path.name} is back to thinking !")
       context.become(thinking)
   }
 
   def hungry: Receive = {
-    case TICTAC =>
+    case Message.TICTAC =>
     hungerTime += 1
     numberOfTurnsSurvived += 1
     if (hungerTime == MAX_HUNGER) {
@@ -51,7 +46,7 @@ class Philosopher(val MAX_THINKING: Int, val MAX_HUNGER: Int, val TIME_TO_EAT: I
       self ! PoisonPill
     }
     print()
-    case EAT =>
+    case Message.EAT =>
     println(s"${self.path.name} is now eating !")
     context.become(eating)
   }

@@ -33,8 +33,8 @@ class PhilosopherShould(_system: ActorSystem)
       val philosopherActor = philosopherRef.underlyingActor
 
       "should not handle a 'eat' message" in {
-        philosopherRef ! "eat"
-        expectMsg(UnhandledMessage("eat", testActor, philosopherRef))
+        philosopherRef ! Message.EAT
+        expectMsg(UnhandledMessage(Message.EAT, testActor, philosopherRef))
       }
 
       "should not handle a 'done eating' message" in {
@@ -44,29 +44,29 @@ class PhilosopherShould(_system: ActorSystem)
 
       "should increase his thinking time by 1 when getting a 'tictac' message" in {
         philosopherActor.thinkingTime should be (0)
-        philosopherRef ! "tictac"
+        philosopherRef ! Message.TICTAC
         philosopherActor.thinkingTime should be (1)
       }
 
       "should increase his number of turns survived by 1 when getting a 'tictac' message" in {
         philosopherActor.numberOfTurnsSurvived should be (1)
-        philosopherRef ! "tictac"
+        philosopherRef ! Message.TICTAC
         philosopherActor.numberOfTurnsSurvived should be (2)
       }
 
     }
 
-    "hungry" should {
+    Message.HUNGRY should {
 
       val philosopherRef = TestActorRef(new Philosopher(MAX_THINKING, MAX_HUNGER, TIME_TO_EAT))
       val philosopherActor = philosopherRef.underlyingActor
 
       // Trigger a change of state thinking -> hungry
-      philosopherRef ! "hungry"
+      philosopherRef ! Message.HUNGRY
 
       "should not handle a 'hungry' message" in {
-        philosopherRef ! "hungry"
-        expectMsg(UnhandledMessage("hungry", testActor, philosopherRef))
+        philosopherRef ! Message.HUNGRY
+        expectMsg(UnhandledMessage(Message.HUNGRY, testActor, philosopherRef))
       }
 
       "should not handle a 'done eating' message" in {
@@ -76,20 +76,20 @@ class PhilosopherShould(_system: ActorSystem)
 
       "should increase his hunger time by 1 when getting a 'tictac' message" in {
         philosopherActor.hungerTime should be (0)
-        philosopherRef ! "tictac"
+        philosopherRef ! Message.TICTAC
         philosopherActor.hungerTime should be (1)
       }
 
       "should increase his number of turns survived by 1 when getting a 'tictac' message" in {
         philosopherActor.numberOfTurnsSurvived should be (1)
-        philosopherRef ! "tictac"
+        philosopherRef ! Message.TICTAC
         philosopherActor.numberOfTurnsSurvived should be (2)
       }
 
       "should die if his hunger reaches its maximum value" in {
         val probe = TestProbe()
         probe watch philosopherRef
-        (2 to MAX_HUNGER).foreach( _ => philosopherRef ! "tictac")
+        (3 to MAX_HUNGER).foreach( _ => philosopherRef ! Message.TICTAC)
         probe.expectTerminated(philosopherRef)
       }
     }
@@ -100,35 +100,36 @@ class PhilosopherShould(_system: ActorSystem)
       val philosopherActor = philosopherRef.underlyingActor
 
       // Trigger a change of state thinking -> hungry
-      philosopherRef ! "hungry"
+      philosopherRef ! Message.HUNGRY
 
       // Trigger a change of state hungry -> eating
-      philosopherRef ! "eat"
+      philosopherRef ! Message.EAT
 
       "should not handle a 'hungry' message" in {
-        philosopherRef ! "hungry"
-        expectMsg(UnhandledMessage("hungry", testActor, philosopherRef))
+        philosopherRef ! Message.HUNGRY
+        expectMsg(UnhandledMessage(Message.HUNGRY, testActor, philosopherRef))
       }
 
       "should not handle a 'eat' message" in {
-        philosopherRef ! "eat"
-        expectMsg(UnhandledMessage("eat", testActor, philosopherRef))
+        philosopherRef ! Message.EAT
+        expectMsg(UnhandledMessage(Message.EAT, testActor, philosopherRef))
       }
 
       "should increase his eating turn by 1 when getting a 'tictac' message" in {
         philosopherActor.eatingTurn should be (0)
-        philosopherRef ! "tictac"
+        philosopherRef ! Message.TICTAC
         philosopherActor.eatingTurn should be (1)
       }
 
       "should increase his number of turns survived by 1 when getting a 'tictac' message" in {
         philosopherActor.numberOfTurnsSurvived should be (1)
-        philosopherRef ! "tictac"
+        philosopherRef ! Message.TICTAC
         philosopherActor.numberOfTurnsSurvived should be (2)
       }
 
       "should be back to thinking when its eating turn reaches the necessary time to eat" in {
-        (2 to TIME_TO_EAT).foreach( _ => philosopherRef ! "tictac")
+        // should trigger a change of state eating -> thinking
+        (2 to TIME_TO_EAT).foreach( _ => philosopherRef ! Message.TICTAC)
         // Message should be unhandled because 'thinking' state does not allow 'done eating' messages
         philosopherRef ! "done eating"
         expectMsg(UnhandledMessage("done eating", testActor, philosopherRef))
