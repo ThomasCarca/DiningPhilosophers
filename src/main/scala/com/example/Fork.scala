@@ -7,12 +7,16 @@ class Fork extends Actor{
 
 
   def free : Receive = {
-    case _ => println("je suis une fourchette.")
-    context.become(taken)
+     case Message.TAKEN =>
+      println(s"Je suis prise ${self.path.name}")
+      context.become(taken)
+     case _ => println(s"Je suis libre ${self.path.name}")
   }
 
   def taken : Receive = {
-    case _ => println("je suis une fourchette sale.")
+    case Message.RELEASED =>
+      println(s"Je suis maintenant libre ${self.path.name}")
+    case  _ => println(s"Je suis occupé ${self.path.name}")
   }
 
 

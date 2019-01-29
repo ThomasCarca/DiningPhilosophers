@@ -1,8 +1,9 @@
 package com.example
 
 import org.scalatest._
-import akka.actor.{ActorSystem, UnhandledMessage}
+import akka.actor.{ActorRef, ActorSystem, Props, UnhandledMessage}
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit, TestProbe}
+import com.example.Main.system
 
 import scala.language.postfixOps
 
@@ -22,6 +23,7 @@ class PhilosopherShould(_system: ActorSystem)
   val MAX_THINKING = 8
   val MAX_HUNGER = 10
   val TIME_TO_EAT = 3
+  val fork =  system.actorOf(Props[Fork])
 
   system.eventStream.subscribe(testActor, classOf[UnhandledMessage])
 
@@ -29,7 +31,7 @@ class PhilosopherShould(_system: ActorSystem)
 
     "thinking" should {
 
-      val philosopherRef = TestActorRef(new Philosopher(MAX_THINKING, MAX_HUNGER, TIME_TO_EAT))
+      val philosopherRef = TestActorRef(new Philosopher(MAX_THINKING, MAX_HUNGER, TIME_TO_EAT, fork))
       val philosopherActor = philosopherRef.underlyingActor
 
       "should not handle a 'eat' message" in {
@@ -58,7 +60,7 @@ class PhilosopherShould(_system: ActorSystem)
 
     Message.HUNGRY should {
 
-      val philosopherRef = TestActorRef(new Philosopher(MAX_THINKING, MAX_HUNGER, TIME_TO_EAT))
+      val philosopherRef = TestActorRef(new Philosopher(MAX_THINKING, MAX_HUNGER, TIME_TO_EAT, fork))
       val philosopherActor = philosopherRef.underlyingActor
 
       // Trigger a change of state thinking -> hungry
@@ -96,7 +98,7 @@ class PhilosopherShould(_system: ActorSystem)
 
     "eating" should {
 
-      val philosopherRef = TestActorRef(new Philosopher(MAX_THINKING, MAX_HUNGER, TIME_TO_EAT))
+      val philosopherRef = TestActorRef(new Philosopher(MAX_THINKING, MAX_HUNGER, TIME_TO_EAT, fork))
       val philosopherActor = philosopherRef.underlyingActor
 
       // Trigger a change of state thinking -> hungry

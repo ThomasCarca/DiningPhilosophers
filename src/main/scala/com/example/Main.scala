@@ -10,17 +10,28 @@ object Main extends App {
 
   def timeToEat: Int = scala.util.Random.nextInt(3) + 2
 
-  def philosopherProp: Props = Props(new Philosopher(thinkingTime, hungerTime, timeToEat))
+  def fork: ActorRef = system.actorOf(Props[Fork])
+
+  def philosopherProp: Props = Props(new Philosopher(thinkingTime, hungerTime, timeToEat ,fork))
 
   val system: ActorSystem = ActorSystem("Dinner")
 
-  val fork: ActorRef = system.actorOf(Props[Fork])
-
   val philosophers: List[ActorRef] = (0 to 4).map(_ => system.actorOf(philosopherProp)).toList
 
-  philosophers.sliding(2) // List(a, b c) => List( List(a,b), List(b,c))
-    .foreach(coupleOfPhilosopher => coupleOfPhilosopher.head ! Neighbour(coupleOfPhilosopher.last.path.name))
+
+  // TODO Refactor
+  philosophers.sliding(3)
+    .foreach(tripletOfPhilosopher => {
+      tripletOfPhilosopher(1) ! Neighbour(tripletOfPhilosopher.last.path.name)
+      tripletOfPhilosopher(1) ! Neighbour(tripletOfPhilosopher.head.path.name)
+    })
+
+  philosophers(0) ! Neighbour(philosophers(1).path.name)
+  philosophers(0) ! Neighbour(philosophers.last.path.name)
+
   philosophers.last ! Neighbour(philosophers.head.path.name)
+  philosophers.last ! Neighbour(philosophers(4).path.name)
+
 
   while (true) {
 
