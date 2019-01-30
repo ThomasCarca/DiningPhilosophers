@@ -2,6 +2,10 @@ package com.example
 
 import akka.actor.{Actor, PoisonPill}
 
+// TODO : Add left/right fork and neighbour as class parameters
+// TODO : Replace HUNGRY, DONE_EATING, EAT messages by internal context change
+// TODO : Handle questions to neighbours in the simplest and naive way.
+
 class Philosopher(val MAX_THINKING: Int, val MAX_HUNGER: Int, val TIME_TO_EAT: Int) extends Actor {
 
   var thinkingTime: Int = 0

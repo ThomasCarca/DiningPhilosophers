@@ -2,6 +2,8 @@ package com.example
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 
+// TODO : Assign instances of philosophers as left/right neighbour to each philosopher
+
 object Main extends App {
 
   def thinkingTime: Int = scala.util.Random.nextInt(10) + 5

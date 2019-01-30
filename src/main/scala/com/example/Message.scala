@@ -1,5 +1,7 @@
 package com.example
 
+// TODO : Refactor Messages into case classes
+
 object Message {
   val TICTAC: String = "tictac"
   val HUNGRY: String = "hungry"
