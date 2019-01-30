@@ -1,6 +1,7 @@
 package com.example
 
 import akka.actor.{Actor, PoisonPill}
+import com.example.messages.{DoneEating, Eat, Hungry, NewTurn}
 
 // TODO : Add left/right fork and neighbour as class parameters
 // TODO : Replace HUNGRY, DONE_EATING, EAT messages by internal context change
@@ -20,29 +21,29 @@ class Philosopher(val MAX_THINKING: Int, val MAX_HUNGER: Int, val TIME_TO_EAT: I
   }
 
   def thinking: Receive = {
-    case Message.TICTAC =>
+    case NewTurn() =>
       thinkingTime += 1
       numberOfTurnsSurvived +=1
-      if (thinkingTime == MAX_THINKING) self ! Message.HUNGRY
+      if (thinkingTime == MAX_THINKING) self ! Hungry()
       print()
-    case Message.HUNGRY =>
+    case Hungry() =>
       println(s"${self.path.name} is now hungry !")
       context.become(hungry)
   }
 
   def eating: Receive = {
-    case Message.TICTAC =>
+    case NewTurn() =>
     eatingTurn += 1
     numberOfTurnsSurvived +=1
-    if (eatingTurn == TIME_TO_EAT) self ! Message.DONE_EATING
+    if (eatingTurn == TIME_TO_EAT) self ! DoneEating()
     print()
-    case Message.DONE_EATING =>
+    case DoneEating() =>
       println(s"${self.path.name} is back to thinking !")
       context.become(thinking)
   }
 
   def hungry: Receive = {
-    case Message.TICTAC =>
+    case NewTurn() =>
     hungerTime += 1
     numberOfTurnsSurvived += 1
     if (hungerTime == MAX_HUNGER) {
@@ -50,7 +51,7 @@ class Philosopher(val MAX_THINKING: Int, val MAX_HUNGER: Int, val TIME_TO_EAT: I
       self ! PoisonPill
     }
     print()
-    case Message.EAT =>
+    case Eat() =>
     println(s"${self.path.name} is now eating !")
     context.become(eating)
   }
